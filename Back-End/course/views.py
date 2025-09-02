@@ -1,13 +1,20 @@
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework import viewsets, generics
-from .permissions import IsAdminOrReadOnly, IsOwnerOrAdmin
+from .permissions import IsAdminOrReadOnly, IsOwnerOrAdminForSubmission
 from .models import Submission, Topic, Video, Task
 from .serializers import SubmissionSerializer, TaskSerializer, TopicSerializer, TopicWithTasksSerializer, TopicWithVideosSerializer, VideoSerializer
 
-class TopicAdminViewSet(viewsets.ModelViewSet):
+class TopicViewSet(viewsets.ModelViewSet):
     queryset = Topic.objects.all()
     serializer_class = TopicSerializer
-    permission_classes = [IsAdminUser]  
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAdminUser]
+        
+        return [permission() for permission in permission_classes]   
 
 class TopicWithVideosView(generics.RetrieveAPIView):
     queryset = Topic.objects.prefetch_related("videos").all()
@@ -33,9 +40,14 @@ class TaskViewSet(viewsets.ModelViewSet):
         serializer.save(creator=self.request.user)  
 
 class SubmissionViewSet(viewsets.ModelViewSet):
-    queryset = Submission.objects.all()
     serializer_class = SubmissionSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    permission_classes = [IsAuthenticated, IsOwnerOrAdminForSubmission]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:  
+            return Submission.objects.all()
+        return Submission.objects.filter(user=user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user) 
+        serializer.save(user=self.request.user)

@@ -1,12 +1,12 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import SubmissionViewSet, TaskViewSet, TopicAdminViewSet, TopicWithTasksView, TopicWithVideosView, VideoViewSet
+from .views import SubmissionViewSet, TaskViewSet, TopicViewSet, TopicWithTasksView, TopicWithVideosView, VideoViewSet
 
 router = DefaultRouter()
 router.register('videos', VideoViewSet)
 router.register('tasks', TaskViewSet)
-router.register('submit', SubmissionViewSet)
-router.register('topics', TopicAdminViewSet, basename='topics')
+router.register('submit', SubmissionViewSet, basename='submission')
+router.register('topics', TopicViewSet, basename='topics')
 
 urlpatterns = [
     path('', include(router.urls)),

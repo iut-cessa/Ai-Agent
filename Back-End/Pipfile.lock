@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9806a2196588cfae35e8eb403bd580ab97e865a80782e5c275c211dd6c857872"
+            "sha256": "27e1d32087cb821ee9afea840fdce51918177bf6617c19bda966ac779963358c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -134,12 +134,12 @@
         },
         "django": {
             "hashes": [
-                "sha256:ad33ed68db9398f5dfb33282704925bce044bef4261cd4fb59e4e7f9ae505a78",
-                "sha256:c36e2ab12824e2ac36afa8b2515a70c53c7742f0d6eaefa7311ec379558db997"
+                "sha256:42fdeaba6e6449d88d4f66de47871015097dc6f1b87910db00a91946295cfae4",
+                "sha256:dafbfaf52c2f289bd65f4ab935791cb4fb9a198f2a5ba9faf35d7338a77e9803"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==4.2"
+            "version": "==4.2.23"
         },
         "django-cors-headers": {
             "hashes": [
@@ -149,6 +149,15 @@
             "index": "pypi",
             "markers": "python_version >= '3.7'",
             "version": "==3.14.0"
+        },
+        "django-debug-toolbar": {
+            "hashes": [
+                "sha256:0cf2cac5c307b77d6e143c914e5c6592df53ffe34642d93929e5ef095ae56841",
+                "sha256:6eb9fa6f4a5884bf04004700ffb5a44043f1fff38784447fc52c1633448c8c14"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.9'",
+            "version": "==6.0.0"
         },
         "django-dotenv": {
             "hashes": [
@@ -160,12 +169,12 @@
         },
         "djangorestframework": {
             "hashes": [
-                "sha256:bea7e9f6b96a8584c5224bfb2e4348dfb3f8b5e34edbecb98da258e892089361",
-                "sha256:f022ff46613584de994c0c6a4aebbace5fd700555fbe9d33b865ebf173eba6c9"
+                "sha256:166809528b1aced0a17dc66c24492af18049f2c9420dbd0be29422029cfc3ff7",
+                "sha256:33a59f47fb9c85ede792cbf88bde71893bcda0667bc573f784649521f1102cec"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.9'",
-            "version": "==3.16.0"
+            "version": "==3.16.1"
         },
         "djangorestframework-simplejwt": {
             "hashes": [

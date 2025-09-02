@@ -37,4 +37,4 @@ class Submission(models.Model):
     grade = models.IntegerField(blank=True, null=True)  
 
     def __str__(self):
-        return f"{self.user.username} - {self.task.title}"
+        return f"{self.user.name} - {self.task.title}"
