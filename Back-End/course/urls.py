@@ -18,5 +18,3 @@ urlpatterns = [
     path('topics/<int:pk>/tasks/', TopicWithTasksView.as_view(), name='topic-tasks'),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
