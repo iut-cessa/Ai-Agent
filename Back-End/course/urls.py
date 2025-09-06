@@ -1,6 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import SubmissionViewSet, TaskViewSet, TopicViewSet, TopicWithTasksView, TopicWithVideosView, VideoViewSet
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 router = DefaultRouter()
 router.register('videos', VideoViewSet)
@@ -14,3 +17,6 @@ urlpatterns = [
     path('topics/<int:pk>/videos/', TopicWithVideosView.as_view(), name='topic-videos'),
     path('topics/<int:pk>/tasks/', TopicWithTasksView.as_view(), name='topic-tasks'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

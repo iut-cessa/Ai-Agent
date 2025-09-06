@@ -1,5 +1,7 @@
 from django.db import models
 from account.models import User
+import os
+import uuid
 
 class Topic(models.Model):
     title = models.CharField(max_length=255)
@@ -8,10 +10,16 @@ class Topic(models.Model):
     def __str__(self):
         return self.title
 
+
+def video_file_path(instance, filename):
+    ext = filename.split('.')[-1] 
+    filename = f"{uuid.uuid4()}.{ext}"
+    return os.path.join('videos', filename)
+
 class Video(models.Model):
     topic = models.ForeignKey(Topic, related_name='videos', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    video_file = models.FileField(upload_to='videos/')
+    video_file = models.FileField(upload_to=video_file_path)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
