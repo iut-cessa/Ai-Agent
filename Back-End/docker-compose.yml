@@ -25,6 +25,8 @@ services:
   web:
     build: .
     container_name: django-app
+    ports:
+      - "8000:8000"
     volumes:
       - static_volume:/app/static
       - media_volume:/app/media
