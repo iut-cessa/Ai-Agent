@@ -11,15 +11,16 @@ class Topic(models.Model):
         return self.title
 
 
-def video_file_path(instance, filename):
-    ext = filename.split('.')[-1] 
-    filename = f"{uuid.uuid4()}.{ext}"
-    return os.path.join('videos', filename)
+# def video_file_path(instance, filename):
+#     ext = filename.split('.')[-1] 
+#     filename = f"{uuid.uuid4()}.{ext}"
+#     return os.path.join('videos', filename)
 
 class Video(models.Model):
     topic = models.ForeignKey(Topic, related_name='videos', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    video_file = models.FileField(upload_to=video_file_path)
+    # video_file = models.FileField(upload_to=video_file_path)
+    video_url= models.CharField(max_length=512,default=None,blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
