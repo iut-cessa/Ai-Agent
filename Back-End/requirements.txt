@@ -12,10 +12,12 @@ django-environ==0.12.0
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
 Fabric39==1.15.3.post2
+gunicorn>=20.1.0
 idna==3.10
 Jinja2==3.1.6
 MarkupSafe==3.0.2
 multiprocess==0.70.18
+mysqlclient>=2.1.0
 paramiko==2.12.0
 pathos==0.2.8
 ply==3.11
