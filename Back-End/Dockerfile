@@ -1,45 +1,63 @@
-# Dockerfile for Django + Gunicorn (for docker-compose)
-FROM python:3.11-slim as builder
-
-WORKDIR /app
-
-# Install system dependencies (including MySQL client)
-RUN apt-get update && \
-    apt-get install -y build-essential libpq-dev default-libmysqlclient-dev pkg-config && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install pipenv and copy dependency files
-RUN pip install pipenv
-COPY Pipfile Pipfile.lock ./
-
-# Install dependencies
-RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy --ignore-pipfile
-
-# Final stage
+# Use Python 3.11 (more stable for Django)
 FROM python:3.11-slim
 
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=AiAgentWeb.settings
+
+# Set work directory
 WORKDIR /app
 
-# Install runtime dependencies for MySQL
-RUN apt-get update && \
-    apt-get install -y default-libmysqlclient-dev && \
-    rm -rf /var/lib/apt/lists/*
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        default-libmysqlclient-dev \
+        pkg-config \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy virtualenv from builder
-COPY --from=builder /app/.venv /app/.venv
-ENV PATH="/app/.venv/bin:$PATH"
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy Django project
+# Copy project files
 COPY . .
 
 # Create static and media directories
-RUN mkdir -p static media
+RUN mkdir -p /app/static /app/media
 
-# Collect static files (skip if no static files yet)
-RUN python manage.py collectstatic --noinput --clear || true
+# Skip collectstatic during build (run it at runtime instead)
+# This avoids database connection issues during build
 
-# Expose port for Gunicorn
+# Create a non-root user
+RUN adduser --disabled-password --gecos '' appuser
+RUN chown -R appuser:appuser /app
+USER appuser
+
+# Expose port
 EXPOSE 8000
 
-# Start Gunicorn
-CMD ["gunicorn", "AiAgentWeb.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/health/ || exit 1
+
+# Create an entrypoint script to run migrations and collectstatic at startup
+USER root
+RUN echo '#!/bin/bash\n\
+echo "Running migrations..."\n\
+python manage.py migrate --noinput\n\
+echo "Collecting static files..."\n\
+python manage.py collectstatic --noinput --clear\n\
+echo "Starting Gunicorn..."\n\
+exec gunicorn --bind 0.0.0.0:8000 --workers 3 --timeout 120 AiAgentWeb.wsgi:application' > /app/entrypoint.sh
+
+RUN chmod +x /app/entrypoint.sh
+RUN chown appuser:appuser /app/entrypoint.sh
+
+USER appuser
+
+# Use the entrypoint script
+CMD ["/app/entrypoint.sh"]
