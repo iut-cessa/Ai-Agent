@@ -16,6 +16,7 @@ RUN apt-get update \
         default-libmysqlclient-dev \
         pkg-config \
         curl \
+        netcat-traditional \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -47,10 +48,22 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # Create an entrypoint script to run migrations and collectstatic at startup
 USER root
 RUN echo '#!/bin/bash\n\
+echo "Waiting for database..."\n\
+while ! nc -z db 3306; do\n\
+  echo "Waiting for MySQL to be ready..."\n\
+  sleep 2\n\
+done\n\
+echo "Database is ready!"\n\
+\n\
 echo "Running migrations..."\n\
 python manage.py migrate --noinput\n\
+\n\
+echo "Creating superuser if not exists..."\n\
+python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(email=\"admin@admin.com\").exists() or User.objects.create_superuser(\"admin@admin.com\", \"admin123\")"\n\
+\n\
 echo "Collecting static files..."\n\
 python manage.py collectstatic --noinput --clear\n\
+\n\
 echo "Starting Gunicorn..."\n\
 exec gunicorn --bind 0.0.0.0:8000 --workers 3 --timeout 120 AiAgentWeb.wsgi:application' > /app/entrypoint.sh
 
