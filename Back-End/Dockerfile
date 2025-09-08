@@ -45,12 +45,13 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8000/health/ || exit 1
 
-# Copy entrypoint script
+# Copy entrypoint script and make it executable
 COPY entrypoint.sh /app/entrypoint.sh
-
-# Make entrypoint executable
 RUN chmod +x /app/entrypoint.sh
-RUN chown appuser:appuser /app/entrypoint.sh
+
+# Create a non-root user
+RUN adduser --disabled-password --gecos '' appuser
+RUN chown -R appuser:appuser /app
 
 USER appuser
 
