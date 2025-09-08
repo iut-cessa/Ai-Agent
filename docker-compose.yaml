@@ -1,0 +1,48 @@
+version: '3.9'
+
+volumes:
+  postgres-db:
+  static_volume:
+  media_volume:
+
+
+services:
+
+  nginx:
+    build: ./nginx
+    image: nginx
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    
+
+  postgres:
+    image: postgres:15
+    expose:
+      - 5432
+    env_file:
+      - .env.database
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+  
+  backend:
+    build: Back-End
+    image: back
+    env_file:
+      - .env.backend
+    expose:
+      - "8001:8001"
+    restart: always
+    container_name: back
+    depends_on:
+      - postgres
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+
+    command: sh -c 'until pg_isready -h postgres -p 5432; do echo "Waiting for postgres..."; sleep 1; done;  python manage.py makemigrations --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn AiAgentWeb.wsgi:application --bind 0.0.0.0:8001'

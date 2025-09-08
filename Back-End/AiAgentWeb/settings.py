@@ -29,18 +29,25 @@ environ.Env.read_env(BASE_DIR / ".env")
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*u&t2fgq01-89d^frp0(1nos535d3fc9&d#hd^0v5kbq=tgyky'
-
+SECRET_KEY = os.environ.get("SECRET_KEY", "some secret")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'your-server-ip', '*']
+CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = ["*"]
+CORS_ALLOW_METHODS = ["*"]
+CSRF_COOKIE_SECURE = True
 
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'corsheaders',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -48,12 +55,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    "corsheaders",
     'account',
     'course',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
@@ -88,26 +95,24 @@ WSGI_APPLICATION = 'AiAgentWeb.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/resf/settings/#databases
 
-SECRET_KEY = env("SECRET_KEY",default='unsecure')
-DEBUG = env("DEBUG",default=True)
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": env("DATABASE_NAME"),
-#         "USER": env("DATABASE_USER"),
-#         "PASSWORD": env("DATABASE_PASSWORD"),
-#         "HOST": env("DATABASE_HOST"),
-#         "PORT": env("DATABASE_PORT"),
-#     }
-# }
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",   # database file will be created in project root
+if os.environ.get('DATABASE_ENGINE') == 'postgres':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_DB', 'postgres'),
+            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'password'),
+            'HOST': os.environ.get('POSTGRES_HOST', 'postgres'),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 EMAIL_HOST_USER = env("EMAIL_USER",default='yalda')
 EMAIL_HOST_PASSWORD = env("EMAIL_PASS",default='something')
