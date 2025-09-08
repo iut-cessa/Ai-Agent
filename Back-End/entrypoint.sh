@@ -11,19 +11,7 @@ echo "Running migrations..."
 python manage.py migrate --noinput
 
 echo "Creating superuser if not exists..."
-python manage.py shell -c "
-from django.contrib.auth import get_user_model
-import os
-User = get_user_model()
-superuser_email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@admin.com')
-superuser_username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
-superuser_password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin123')
-if not User.objects.filter(email=superuser_email).exists():
-    User.objects.create_superuser(email=superuser_email, username=superuser_username, password=superuser_password)
-    print(f'Superuser created with email: {superuser_email}')
-else:
-    print(f'Superuser already exists with email: {superuser_email}')
-"
+python manage.py create_superuser_safe
 
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear
