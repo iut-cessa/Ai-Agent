@@ -73,6 +73,8 @@ services:
       # Static and media files
       - static_volume:/app/static
       - media_volume:/app/media
+      # Landing page
+      - ./static_pages:/app/static_pages
     depends_on:
       - web
       - phpmyadmin
