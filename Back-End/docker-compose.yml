@@ -69,8 +69,6 @@ services:
       - ./nginx/main-site.conf:/etc/nginx/conf.d/main-site.conf
       - ./nginx/api-site.conf:/etc/nginx/conf.d/api-site.conf
       - ./nginx/admin-site.conf:/etc/nginx/conf.d/admin-site.conf
-      # Authentication file for phpMyAdmin
-      - ./nginx/htpasswd:/etc/nginx/.htpasswd
       # Static and media files
       - static_volume:/app/static
       - media_volume:/app/media
