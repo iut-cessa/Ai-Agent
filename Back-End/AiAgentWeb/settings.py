@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'drf_yasg',  # Swagger/OpenAPI documentation
+    'drf_spectacular',  # OpenAPI 3.0 documentation
     "corsheaders",
     'account',
     'course',
@@ -70,7 +70,7 @@ ROOT_URLCONF = 'AiAgentWeb.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -172,37 +172,84 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-# Swagger/OpenAPI Settings
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
+# DRF Spectacular Settings for OpenAPI 3.0
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'AI Agent API',
+    'DESCRIPTION': 'AI Agent API Documentation - Authentication required to access endpoints',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'COMPONENT_NO_READ_ONLY_REQUIRED': True,
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+        'displayRequestDuration': True,
+        'filter': True,
+        'requestSnippetsEnabled': True,
+        'requestSnippets': {
+            'generators': {
+                'curl_bash': {
+                    'title': 'cURL (bash)',
+                    'syntax': 'bash'
+                },
+                'curl_powershell': {
+                    'title': 'cURL (PowerShell)',
+                    'syntax': 'powershell'
+                },
+                'curl_cmd': {
+                    'title': 'cURL (CMD)',
+                    'syntax': 'bash'
+                }
+            },
+            'defaultExpanded': True,
+            'languages': ['curl_bash', 'curl_powershell', 'curl_cmd']
         }
     },
-    'USE_SESSION_AUTH': False,
-    'JSON_EDITOR': True,
-    'SUPPORTED_SUBMIT_METHODS': [
-        'get',
-        'post',
-        'put',
-        'delete',
-        'patch'
+    'SECURITY': [
+        {
+            'jwtAuth': []
+        }
     ],
-    'OPERATIONS_SORTER': 'alpha',
-    'TAGS_SORTER': 'alpha',
-    'DOC_EXPANSION': 'none',
-    'DEEP_LINKING': True,
-    'SHOW_EXTENSIONS': True,
-    'SHOW_COMMON_EXTENSIONS': True,
-}
-
-REDOC_SETTINGS = {
-    'LAZY_RENDERING': False,
+    'AUTHENTICATION_WHITELIST': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'SCHEMA_PATH_PREFIX': r'/api/',
+    'SCHEMA_MOUNT_PATH': '/schema/',
+    'TAGS': [
+        {'name': 'Authentication', 'description': 'User authentication endpoints'},
+        {'name': 'Courses', 'description': 'Course management endpoints'},
+        {'name': 'Account', 'description': 'User account management'},
+    ],
+    'SECURITY_DEFINITIONS': {
+        'jwtAuth': {
+            'type': 'http',
+            'scheme': 'bearer',
+            'bearerFormat': 'JWT',
+            'description': 'Enter JWT token in format: Bearer <token>'
+        }
+    },
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    'REDOC_UI_SETTINGS': {
+        'hideDownloadButton': False,
+        'hideHostname': False,
+        'hideLoading': False,
+        'hideSchemaPattern': True,
+        'expandResponses': 'all',
+        'pathInMiddlePanel': True,
+        'theme': {
+            'colors': {
+                'primary': {
+                    'main': '#1976d2'
+                }
+            }
+        }
+    }
 }
 # Email Configuration
 EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
@@ -248,3 +295,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 PASSWORD_RESET_TIMEOUT = 900
+
+# Login/Logout redirects
+LOGIN_REDIRECT_URL = '/swagger/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGIN_URL = '/accounts/login/'
