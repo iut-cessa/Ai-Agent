@@ -6,8 +6,8 @@ from account.renderers import UserRenderer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-from drf_spectacular.types import OpenApiTypes
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -21,22 +21,24 @@ class UserRegistrationView(APIView):
   renderer_classes = [UserRenderer]
   permission_classes = [AllowAny]  # Allow registration without authentication
   
-  @extend_schema(
-      summary="User Registration",
-      description="Register a new user account",
-      request=UserRegistrationSerializer,
+  @swagger_auto_schema(
+      operation_summary="User Registration",
+      operation_description="Register a new user account",
+      request_body=UserRegistrationSerializer,
       responses={
-          201: {
-              "description": "Registration successful",
-              "example": {
-                  "token": {
-                      "refresh": "refresh_token_here",
-                      "access": "access_token_here"
-                  },
-                  "msg": "Registration Success"
+          201: openapi.Response(
+              description="Registration successful",
+              examples={
+                  "application/json": {
+                      "token": {
+                          "refresh": "refresh_token_here",
+                          "access": "access_token_here"
+                      },
+                      "msg": "Registration Success"
+                  }
               }
-          },
-          400: {"description": "Bad request - validation errors"},
+          ),
+          400: openapi.Response("Bad request - validation errors"),
       },
       tags=['User - Authentication']
   )
@@ -52,23 +54,25 @@ class UserLoginView(APIView):
   renderer_classes = [UserRenderer]
   permission_classes = [AllowAny]  # Allow login without authentication
   
-  @extend_schema(
-      summary="User Login",
-      description="Authenticate user and get JWT tokens",
-      request=UserLoginSerializer,
+  @swagger_auto_schema(
+      operation_summary="User Login",
+      operation_description="Authenticate user and get JWT tokens",
+      request_body=UserLoginSerializer,
       responses={
-          200: {
-              "description": "Login successful",
-              "example": {
-                  "token": {
-                      "refresh": "refresh_token_here",
-                      "access": "access_token_here"
-                  },
-                  "msg": "Login Success"
+          200: openapi.Response(
+              description="Login successful",
+              examples={
+                  "application/json": {
+                      "token": {
+                          "refresh": "refresh_token_here",
+                          "access": "access_token_here"
+                      },
+                      "msg": "Login Success"
+                  }
               }
-          },
-          404: {"description": "Invalid credentials"},
-          400: {"description": "Bad request - validation errors"},
+          ),
+          404: openapi.Response("Invalid credentials"),
+          400: openapi.Response("Bad request - validation errors"),
       },
       tags=['User - Authentication']
   )
@@ -89,14 +93,15 @@ class UserProfileView(APIView):
   renderer_classes = [UserRenderer]
   permission_classes = [IsAuthenticated]
   
-  @extend_schema(
-      summary="Get User Profile",
-      description="Get current authenticated user's profile information",
+  @swagger_auto_schema(
+      operation_summary="Get User Profile",
+      operation_description="Get current authenticated user's profile information",
       responses={
           200: UserProfileSerializer,
-          401: {"description": "Unauthorized - Authentication required"},
+          401: openapi.Response("Unauthorized - Authentication required"),
       },
-      tags=['User - Profile Management']
+      tags=['User - Profile Management'],
+      security=[{'Bearer': []}]
   )
   def get(self, request, format=None):
     serializer = UserProfileSerializer(request.user)
@@ -106,21 +111,24 @@ class UserChangePasswordView(APIView):
   renderer_classes = [UserRenderer]
   permission_classes = [IsAuthenticated]
   
-  @extend_schema(
-      summary="Change Password",
-      description="Change password for authenticated user",
-      request=UserChangePasswordSerializer,
+  @swagger_auto_schema(
+      operation_summary="Change Password",
+      operation_description="Change password for authenticated user",
+      request_body=UserChangePasswordSerializer,
       responses={
-          200: {
-              "description": "Password changed successfully",
-              "example": {
-                  "msg": "Password Changed Successfully"
+          200: openapi.Response(
+              description="Password changed successfully",
+              examples={
+                  "application/json": {
+                      "msg": "Password Changed Successfully"
+                  }
               }
-          },
-          400: {"description": "Bad request - validation errors"},
-          401: {"description": "Unauthorized - Authentication required"},
+          ),
+          400: openapi.Response("Bad request - validation errors"),
+          401: openapi.Response("Unauthorized - Authentication required"),
       },
-      tags=['User - Profile Management']
+      tags=['User - Profile Management'],
+      security=[{'Bearer': []}]
   )
   def post(self, request, format=None):
     serializer = UserChangePasswordSerializer(data=request.data, context={'user':request.user})
@@ -132,18 +140,20 @@ class SendPasswordResetEmailView(APIView):
   renderer_classes = [UserRenderer]
   permission_classes = [AllowAny]  # Allow password reset email without authentication
   
-  @extend_schema(
-      summary="Send Password Reset Email",
-      description="Send password reset link to user's email",
-      request=SendPasswordResetEmailSerializer,
+  @swagger_auto_schema(
+      operation_summary="Send Password Reset Email",
+      operation_description="Send password reset link to user's email",
+      request_body=SendPasswordResetEmailSerializer,
       responses={
-          200: {
-              "description": "Password reset email sent",
-              "example": {
-                  "msg": "Password Reset link send. Please check your Email"
+          200: openapi.Response(
+              description="Password reset email sent",
+              examples={
+                  "application/json": {
+                      "msg": "Password Reset link send. Please check your Email"
+                  }
               }
-          },
-          400: {"description": "Bad request - validation errors"},
+          ),
+          400: openapi.Response("Bad request - validation errors"),
       },
       tags=['User - Password Reset']
   )
@@ -156,22 +166,24 @@ class UserPasswordResetView(APIView):
   renderer_classes = [UserRenderer]
   permission_classes = [AllowAny]  # Allow password reset without authentication
   
-  @extend_schema(
-      summary="Reset Password",
-      description="Reset user password using token from email",
-      request=UserPasswordResetSerializer,
-      parameters=[
-          OpenApiParameter('uid', OpenApiTypes.STR, OpenApiParameter.PATH, description="User ID"),
-          OpenApiParameter('token', OpenApiTypes.STR, OpenApiParameter.PATH, description="Reset token"),
+  @swagger_auto_schema(
+      operation_summary="Reset Password",
+      operation_description="Reset user password using token from email",
+      request_body=UserPasswordResetSerializer,
+      manual_parameters=[
+          openapi.Parameter('uid', openapi.IN_PATH, description="User ID", type=openapi.TYPE_STRING),
+          openapi.Parameter('token', openapi.IN_PATH, description="Reset token", type=openapi.TYPE_STRING),
       ],
       responses={
-          200: {
-              "description": "Password reset successful",
-              "example": {
-                  "msg": "Password Reset Successfully"
+          200: openapi.Response(
+              description="Password reset successful",
+              examples={
+                  "application/json": {
+                      "msg": "Password Reset Successfully"
+                  }
               }
-          },
-          400: {"description": "Bad request - validation errors"},
+          ),
+          400: openapi.Response("Bad request - validation errors"),
       },
       tags=['User - Password Reset']
   )
