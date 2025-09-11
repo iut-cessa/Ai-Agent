@@ -184,7 +184,9 @@ SWAGGER_SETTINGS = {
             'in': 'header'
         }
     },
-    'USE_SESSION_AUTH': False,
+    'USE_SESSION_AUTH': True,  # Enable session auth for Swagger UI
+    'LOGIN_URL': '/admin/login/',  # Redirect to admin login
+    'LOGOUT_URL': '/admin/logout/',  # Logout URL
     'JSON_EDITOR': True,
     'SUPPORTED_SUBMIT_METHODS': [
         'get',
