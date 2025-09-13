@@ -23,14 +23,14 @@ services:
 
   # Django Web App
   web:
-    build: .
+    build: Back-End
     container_name: django-app
     ports:
       - "8000:8000"
     volumes:
       - static_volume:/app/static
       - media_volume:/app/media
-      - ./logs:/app/logs  # Add logs volume for request logging
+      - ./Back-End/logs:/app/logs  # Add logs volume for request logging
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DEBUG=${DEBUG}
@@ -67,15 +67,15 @@ services:
       # Main nginx configuration
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       # Site configurations
-      - ./nginx/main-site.conf:/etc/nginx/conf.d/main-site.conf
-      - ./nginx/api-site.conf:/etc/nginx/conf.d/api-site.conf
-      - ./nginx/admin-site.conf:/etc/nginx/conf.d/admin-site.conf
+      - ./nginx/domains/main-site.conf:/etc/nginx/conf.d/main-site.conf
+      - ./nginx/domains/api-site.conf:/etc/nginx/conf.d/api-site.conf
+      - ./nginx/domains/admin-site.conf:/etc/nginx/conf.d/admin-site.conf
       - ./nginx/auth/:/etc/nginx/auth/:ro
       # Static and media files
       - static_volume:/app/static
       - media_volume:/app/media
       # Landing page
-      - ./static_pages:/app/static_pages
+      - ./static:/app/static_pages
     depends_on:
       - web
       - phpmyadmin
