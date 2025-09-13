@@ -44,6 +44,10 @@ class SubmissionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsOwnerOrAdminForSubmission]
 
     def get_queryset(self):
+        # Handle Swagger schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Submission.objects.none()
+        
         user = self.request.user
         if user.is_staff:  
             return Submission.objects.all()
