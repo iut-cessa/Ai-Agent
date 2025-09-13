@@ -29,6 +29,7 @@ uritemplate = "==4.1.1"
 urllib3 = "==1.26.15"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
+drf-yasg = "*"
 django = "*"
 django-debug-toolbar = "*"
 
