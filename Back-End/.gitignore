@@ -19,5 +19,7 @@ static/
 
 nginx/auth
 
+Pipfile.lock
+
 ./media
 ./videos
