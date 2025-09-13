@@ -245,7 +245,13 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://127.0.0.1:9000",
-    "http://localhost:8000"
+    "http://localhost:8000",
+    "https://iut-aiagent.ir"
+]
+
+# CSRF Trusted Origins - Required for Django 4.0+ when making cross-origin requests to CSRF-protected views
+CSRF_TRUSTED_ORIGINS = [
+    "https://iut-aiagent.ir"
 ]
 
 PASSWORD_RESET_TIMEOUT = 900
