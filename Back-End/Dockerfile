@@ -27,8 +27,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
-# Create static and media directories
-RUN mkdir -p /app/static /app/media
+# Create static, media, and logs directories with proper permissions
+RUN mkdir -p /app/static /app/media /app/logs
 
 # Skip collectstatic during build (run it at runtime instead)
 # This avoids database connection issues during build

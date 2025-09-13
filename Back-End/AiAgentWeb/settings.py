@@ -269,10 +269,14 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
+        'console': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': '/app/logs/django.log',
+            'class': 'logging.StreamHandler',
+            'formatter': 'request_format',
+        },
+        'django_console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
         'request_file': {
@@ -280,21 +284,24 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': '/app/logs/requests.log',
             'formatter': 'request_format',
+            'mode': 'a',
         },
-        'console': {
+        'django_file': {
             'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'request_format',
+            'class': 'logging.FileHandler',
+            'filename': '/app/logs/django.log',
+            'formatter': 'verbose',
+            'mode': 'a',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
+            'handlers': ['django_console', 'django_file'],
             'level': 'INFO',
             'propagate': True,
         },
         'request_logger': {
-            'handlers': ['request_file', 'console'],
+            'handlers': ['console', 'request_file'],
             'level': 'INFO',
             'propagate': False,
         },

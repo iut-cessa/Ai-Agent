@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Create logs directory if it doesn't exist
-echo "Creating logs directory..."
+# Ensure logs directory exists with proper permissions
+echo "Setting up logs directory..."
 mkdir -p /app/logs
-chmod 755 /app/logs
+touch /app/logs/django.log /app/logs/requests.log 2>/dev/null || echo "Note: Log files will be created when needed"
 
 echo "Waiting for database..."
 while ! nc -z db 3306; do
