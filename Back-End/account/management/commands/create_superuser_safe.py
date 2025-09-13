@@ -24,7 +24,7 @@ class Command(BaseCommand):
             help='Superuser email address',
         )
         parser.add_argument(
-            '--username', 
+            '--name', 
             type=str,
             help='Superuser username',
         )
@@ -92,7 +92,7 @@ class Command(BaseCommand):
             # Check if user exists by username
             if not existing_user:
                 try:
-                    existing_user = User.objects.get(username=username)
+                    existing_user = User.objects.get(name=username)
                     self.stdout.write(
                         self.style.WARNING(f"✅ User with username '{username}' already exists")
                     )
@@ -103,7 +103,7 @@ class Command(BaseCommand):
                 if options.get('force_update'):
                     # Update existing user
                     existing_user.email = email
-                    existing_user.username = username
+                    existing_user.name = username
                     existing_user.set_password(password)
                     existing_user.is_staff = True
                     existing_user.is_superuser = True
@@ -127,7 +127,7 @@ class Command(BaseCommand):
                 
                 user = User.objects.create_superuser(
                     email=email,
-                    username=username,
+                    name=username,
                     password=password
                 )
                 
@@ -154,7 +154,7 @@ class Command(BaseCommand):
     def _display_user_info(self, user):
         """Display user information in a formatted way."""
         self.stdout.write(f"   ID: {user.id}")
-        self.stdout.write(f"   Username: {user.username}")
+        self.stdout.write(f"   Username: {user.name}")
         self.stdout.write(f"   Email: {user.email}")
         self.stdout.write(f"   Is Staff: {user.is_staff}")
         self.stdout.write(f"   Is Superuser: {user.is_superuser}")
