@@ -37,7 +37,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    # Admin
+    # Admin 
     path('admin/', admin.site.urls),
     
     # API endpoints

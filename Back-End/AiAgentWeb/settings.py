@@ -63,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'AiAgentWeb.middleware.RequestResponseLoggingMiddleware',  # Request logging middleware
 ]
 
 ROOT_URLCONF = 'AiAgentWeb.urls'
@@ -248,3 +249,54 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 PASSWORD_RESET_TIMEOUT = 900
+
+# Logging Configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{message}',
+            'style': '{',
+        },
+        'request_format': {
+            'format': '{message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/app/logs/django.log',
+            'formatter': 'verbose',
+        },
+        'request_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/app/logs/requests.log',
+            'formatter': 'request_format',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'request_format',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'request_logger': {
+            'handlers': ['request_file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

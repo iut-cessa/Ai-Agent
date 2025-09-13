@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Create logs directory if it doesn't exist
+echo "Creating logs directory..."
+mkdir -p /app/logs
+chmod 755 /app/logs
+
 echo "Waiting for database..."
 while ! nc -z db 3306; do
   echo "Waiting for MySQL to be ready..."
