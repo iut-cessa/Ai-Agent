@@ -250,21 +250,17 @@ CORS_ALLOWED_ORIGINS = [
 
 PASSWORD_RESET_TIMEOUT = 900
 
-# Logging Configuration
+# Simple Console Logging Configuration (no files to avoid permission issues)
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
         'simple': {
             'format': '{message}',
             'style': '{',
         },
-        'request_format': {
-            'format': '{message}',
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
             'style': '{',
         },
     },
@@ -272,20 +268,14 @@ LOGGING = {
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'formatter': 'request_format',
-        },
-        'django_console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
+            'formatter': 'simple',
         },
     },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
     'loggers': {
-        'django': {
-            'handlers': ['django_console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
         'request_logger': {
             'handlers': ['console'],
             'level': 'INFO',
