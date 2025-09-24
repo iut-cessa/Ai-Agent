@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.8'
 
 volumes:
   postgres-db:
@@ -9,40 +9,73 @@ volumes:
 services:
 
   nginx:
-    build: ./nginx
-    image: nginx
+    image: nginx:alpine
+    container_name: nginx-proxy
     ports:
       - 80:80
+      - 443:443
     depends_on:
-      - backend
+      - web
+      - postgres
+    restart: unless-stopped
+    networks:
+      - app-network
     volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/domains/main-site.conf:/etc/nginx/conf.d/main-site.conf
+      # - ./nginx/domains/api-site.conf:/etc/nginx/conf.d/api-site.conf
+      - ./nginx/domains/admin-site.conf:/etc/nginx/conf.d/admin-site.conf
+      - ./nginx/auth/:/etc/nginx/auth/:ro
       - static_volume:/app/static
       - media_volume:/app/media
+      - ./static:/app/static_pages
     
 
   postgres:
     image: postgres:15
-    expose:
-      - 5432
+    container_name: postgres-db
+    ports:
+      - "127.0.0.1:5432:5432"
+    networks:
+      - app-network
     env_file:
       - .env.database
     volumes:
       - postgres-db:/var/lib/postgresql/data
 
-  
-  backend:
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  web:
     build: Back-End
     image: back
     env_file:
       - .env.backend
     expose:
-      - "8001:8001"
+      - "8000:8000"
     restart: always
-    container_name: back
+    container_name: django-app
     depends_on:
       - postgres
+    networks:
+      - app-network
     volumes:
       - static_volume:/app/static
       - media_volume:/app/media
+      - ./Back-End/logs:/app/logs 
 
-    command: sh -c 'until pg_isready -h postgres -p 5432; do echo "Waiting for postgres..."; sleep 1; done;  python manage.py makemigrations --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn AiAgentWeb.wsgi:application --bind 0.0.0.0:8001'
+    command: sh -c 'until pg_isready -h postgres -p 5432; do echo "Waiting for postgres..."; sleep 1; done;  python manage.py makemigrations --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn AiAgentWeb.wsgi:application --bind 0.0.0.0:8000'
+
+networks:
+  app-network:
+    driver: bridge

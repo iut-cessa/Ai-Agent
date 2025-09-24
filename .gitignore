@@ -17,6 +17,9 @@ static/
 # Ignore environment files (e.g. .env or .env.local)
 .env
 
+nginx/auth
+nginx/domains/api-site*
+
 media/
 videos/
 .env.backend
