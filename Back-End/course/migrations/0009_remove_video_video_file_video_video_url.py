@@ -17,6 +17,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='video',
             name='video_url',
-            field=models.CharField(blank=True, default=None, max_length=512),
+            field=models.CharField(blank=True, null=True, default="", max_length=512),
         ),
     ]
