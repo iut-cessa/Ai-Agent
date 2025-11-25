@@ -36,3 +36,4 @@ streamparse==5.0.1
 texttable==1.7.0
 thriftpy2==0.5.3
 urllib3==2.5.0
+drf-yasg==1.21.8

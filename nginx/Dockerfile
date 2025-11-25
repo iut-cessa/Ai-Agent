@@ -1,9 +1,11 @@
-FROM nginx
+FROM nginx:1.27.1-alpine
 
-# Copy your nginx config and ensure it has .conf extension
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+RUN rm /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+RUN rm /etc/nginx/nginx.conf
 
+ADD nginx/domains/* /etc/nginx/sites-enabled/
+
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
 # Run nginx in foreground
 CMD ["nginx", "-g", "daemon off;"]
